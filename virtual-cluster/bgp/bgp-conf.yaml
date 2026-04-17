@@ -1,0 +1,33 @@
+# 1. Define the IP Pool for the Virtual Cluster
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: tenant2-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.10.12.16/28
+
+---
+# 2. Establish the BGP Peering Session to the Host Cluster Transit Router
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: peer-to-host-cluster
+  namespace: metallb-system
+spec:
+  myASN: 64512
+  peerASN: 64511
+  peerAddress: 192.168.8.99
+  ebgpMultiHop: true
+
+---
+# 3. Instruct MetalLB to advertise the Pool via the BGP Peer
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: tenant2-bgp-adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - tenant2-pool

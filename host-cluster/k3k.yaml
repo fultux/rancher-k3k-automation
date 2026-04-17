@@ -1,0 +1,14 @@
+apiVersion: k3k.io/v1beta1
+kind: Cluster
+metadata:
+  name: k3k-fleet-test
+  namespace: tenant2 # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
+spec:
+  mode: virtual
+  version: v1.31.3-k3s1
+  servers: 1
+  agents: 1
+  persistence:
+    type: dynamic
+    storageClassName: "nfs-subdir"
+    storageRequestSize: 3Gi

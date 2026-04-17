@@ -1,0 +1,14 @@
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: k3k-automated-test
+  namespace: fleet-default
+  labels:
+    deploy-metallb: allowed
+  annotations:
+    ui.rancher/k3k-namespace: tenant2
+    ui.rancher/parent-cluster: c-m-dmj78vrr
+    ui.rancher/parent-cluster-display: host-cl-calio-multus
+    ui.rancher/provider: k3k
+    rancher.io/imported-cluster-version-management: 'false'
+spec: {}
