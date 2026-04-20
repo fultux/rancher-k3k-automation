@@ -1,16 +1,18 @@
 #!/bin/bash
 # Exit on error
+set -x
 set -e
 
 # --- Configuration & Defaults ---
-VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-automated-test"}
+VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
 VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
-HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"host-cl-calio-multus"}
+HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
 FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
 
-if [ -z "$RANCHER_SERVER_URL" ] || [ -z "$RANCHER_TOKEN" ]; then
-    echo "Error: RANCHER_SERVER_URL and RANCHER_TOKEN environment variables must be set."
-    echo "Example: export RANCHER_SERVER_URL=https://rancher.example.com/k8s/clusters/local"
+if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
+    echo "Error: RANCHER_KUBECONFIG and HOST_KUBECONFIG environment variables must be set."
+    echo "Example: export RANCHER_KUBECONFIG=/path/to/rancher.yaml"
+    echo "         export HOST_KUBECONFIG=/path/to/downstream.yaml"
     exit 1
 fi
 
@@ -19,15 +21,9 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
-if ! command -v rancher &> /dev/null; then
-    echo "Error: rancher CLI is required but not installed."
-    echo "Download from: https://github.com/rancher/cli/releases"
-    exit 1
-fi
-
 # Helper function for kubectl to the local rancher cluster
 kc_local() {
-    kubectl --server="$RANCHER_SERVER_URL" --token="$RANCHER_TOKEN" --insecure-skip-tls-verify=true "$@"
+    kubectl --kubeconfig="$RANCHER_KUBECONFIG" "$@"
 }
 
 echo "--- Deploying k3k cluster via Rancher Fleet ---"
@@ -46,7 +42,10 @@ done
 echo "Virtual Cluster ID assigned: $VCLUSTER_ID"
 
 # 3. Idempotency Check & Get Import Command
+# Get Rancher server URL from kubeconfig
+RANCHER_SERVER_URL=$(kc_local config view --minify -o jsonpath='{.clusters[0].cluster.server}')
 RANCHER_BASE_URL=$(echo "$RANCHER_SERVER_URL" | sed 's|/k8s/clusters/local.*||')
+
 echo "Checking if cluster is already fully provisioned and Active..."
 
 IS_READY=$(kc_local get cluster.provisioning.cattle.io "$VCLUSTER_NAME" -n "$FLEET_NAMESPACE" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "False")
@@ -55,23 +54,28 @@ if [ "$IS_READY" == "True" ]; then
     echo "Cluster is already Active! Skipping import command generation."
     IMPORT_CMD="echo 'Cluster already Active, no injection needed.'"
 else
-    echo "Logging into Rancher Local Control Plane..."
-    # We explicitly pass '--context local' to skip the dangerous numbered prompt entirely!
+    echo "Getting Import Command for Rancher Virtual Cluster..."
+    # Get the bearer token for rancher CLI using kubectl
+    RANCHER_TOKEN=$(kc_local get secret $(kc_local get serviceaccount default -n default -o jsonpath='{.secrets[0].name}') -n default -o jsonpath='{.data.token}' | base64 --decode || echo "")
+
+    if [ -z "$RANCHER_TOKEN" ]; then
+        echo "Could not find a token to log in with rancher cli, attempting to extract from kubeconfig"
+        RANCHER_TOKEN=$(kc_local config view --minify -o jsonpath='{.users[0].user.token}')
+    fi
+
+    if [ -z "$RANCHER_TOKEN" ]; then
+         echo "Error: Could not extract a token to log into the Rancher CLI to generate the import command."
+         exit 1
+    fi
+
     rancher login "$RANCHER_BASE_URL" --token "$RANCHER_TOKEN" --skip-verify --context local
     IMPORT_CMD=$(rancher cluster import "$VCLUSTER_NAME" | grep '^curl')
 fi
 
 # 4. Wait for k3k to generate kubeconfig on host cluster
-HOST_ID=$(kc_local get cluster.provisioning.cattle.io "$HOST_CLUSTER_NAME" -n "$FLEET_NAMESPACE" -o jsonpath='{.status.clusterName}')
-
-if [ -z "$HOST_ID" ]; then
-    echo "Error: Could not find Host Cluster ID for '$HOST_CLUSTER_NAME'."
-    exit 1
-fi
-
-# Helper function for kubectl to the downstream host cluster via Rancher proxy
+# Helper function for kubectl to the downstream host cluster via kubeconfig
 kc_host() {
-    kubectl --server="$RANCHER_BASE_URL/k8s/clusters/$HOST_ID" --token="$RANCHER_TOKEN" --insecure-skip-tls-verify=true "$@"
+    kubectl --kubeconfig="$HOST_KUBECONFIG" "$@"
 }
 
 echo "Waiting for k3k pods to generate kubeconfig on host cluster ($HOST_CLUSTER_NAME)..."

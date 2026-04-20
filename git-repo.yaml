@@ -27,4 +27,4 @@ spec:
     - host-cluster
   targets:
     # Replace with the actual name of your downstream cluster in Rancher Fleet
-    - clusterName: host-cl-calio-multus
+    - clusterName: kubevip

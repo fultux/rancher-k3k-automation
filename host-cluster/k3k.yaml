@@ -5,10 +5,10 @@ metadata:
   namespace: tenant2 # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
 spec:
   mode: virtual
-  version: v1.31.3-k3s1
+  version: v1.33.10-k3s1
   servers: 1
   agents: 1
   persistence:
     type: dynamic
-    storageClassName: "nfs-subdir"
+    storageClassName: "harvester"
     storageRequestSize: 3Gi
