@@ -1,7 +1,10 @@
 #!/bin/bash
-# Exit on error
-set -x
-set -e
+#Uncomment to enable debug
+#set -x
+set -e # Exit on error
+
+# Change working directory to the project root
+cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults ---
 VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
@@ -30,7 +33,7 @@ echo "--- Deploying k3k cluster via Rancher Fleet ---"
 
 # 1. Sync Fleet to create the placeholder and the pods
 echo "Applying Fleet GitRepo definitions..."
-kc_local apply -f git-repo.yaml
+kc_local apply -f fleet/git-repo.yaml
 
 # 2. Wait for Rancher to process the placeholder
 echo "Waiting for Virtual Cluster ID for '$VCLUSTER_NAME'..."
@@ -55,21 +58,30 @@ if [ "$IS_READY" == "True" ]; then
     IMPORT_CMD="echo 'Cluster already Active, no injection needed.'"
 else
     echo "Getting Import Command for Rancher Virtual Cluster..."
-    # Get the bearer token for rancher CLI using kubectl
-    RANCHER_TOKEN=$(kc_local get secret $(kc_local get serviceaccount default -n default -o jsonpath='{.secrets[0].name}') -n default -o jsonpath='{.data.token}' | base64 --decode || echo "")
 
-    if [ -z "$RANCHER_TOKEN" ]; then
-        echo "Could not find a token to log in with rancher cli, attempting to extract from kubeconfig"
-        RANCHER_TOKEN=$(kc_local config view --minify -o jsonpath='{.users[0].user.token}')
+    echo "Checking for existing ClusterRegistrationToken..."
+    TOKEN_NAME=$(kc_local get clusterregistrationtoken -n "$VCLUSTER_ID" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+    if [ -z "$TOKEN_NAME" ]; then
+        TOKEN_NAME="token-$(date +%s)"
+        echo "Creating ClusterRegistrationToken $TOKEN_NAME..."
+        cat <<EOF | kc_local create -f -
+apiVersion: management.cattle.io/v3
+kind: ClusterRegistrationToken
+metadata:
+  name: $TOKEN_NAME
+  namespace: $VCLUSTER_ID
+spec:
+  clusterName: $VCLUSTER_ID
+EOF
     fi
 
-    if [ -z "$RANCHER_TOKEN" ]; then
-         echo "Error: Could not extract a token to log into the Rancher CLI to generate the import command."
-         exit 1
-    fi
-
-    rancher login "$RANCHER_BASE_URL" --token "$RANCHER_TOKEN" --skip-verify --context local
-    IMPORT_CMD=$(rancher cluster import "$VCLUSTER_NAME" | grep '^curl')
+    # Wait for the cluster registration token to be generated
+    while true; do
+        IMPORT_CMD=$(kc_local get ClusterRegistrationToken.management.cattle.io "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.status.insecureCommand}' 2>/dev/null || true)
+        if [ -n "$IMPORT_CMD" ]; then break; fi
+        sleep 5
+    done
 fi
 
 # 4. Wait for k3k to generate kubeconfig on host cluster
