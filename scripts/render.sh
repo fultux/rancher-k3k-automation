@@ -5,9 +5,11 @@ set -e
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults (Synchronized with deploy.sh) ---
-export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
+export VCLUSTER_NAME=${VCLUSTER_NAME:-"aaaaa"}
 export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
 export VCLUSTER_MODE=${VCLUSTER_MODE:-"shared"}
+export VCLUSTER_SERVERS=${VCLUSTER_SERVERS:-1}
+export VCLUSTER_AGENTS=${VCLUSTER_AGENTS:-2}
 export VCLUSTER_VERSION=${VCLUSTER_VERSION:-"v1.33.10-k3s1"}
 export VCLUSTER_TLS_SANS=${VCLUSTER_TLS_SANS:-""}
 export HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}

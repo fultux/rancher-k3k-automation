@@ -7,7 +7,7 @@ spec:
   mode: shared
   version: v1.33.10-k3s1
   servers: 1
-  agents: 1
+  agents: 2
 
   persistence:
     type: dynamic

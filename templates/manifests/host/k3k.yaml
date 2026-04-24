@@ -6,8 +6,8 @@ metadata:
 spec:
   mode: ${VCLUSTER_MODE}
   version: ${VCLUSTER_VERSION}
-  servers: 1
-  agents: 1
+  servers: ${VCLUSTER_SERVERS}
+  agents: ${VCLUSTER_AGENTS}
 ${TLS_SANS_BLOCK}
   persistence:
     type: dynamic
