@@ -2,11 +2,11 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: tenant2-pool
+  name: ${VCLUSTER_NAMESPACE}-pool
   namespace: metallb-system
 spec:
   addresses:
-  - 10.10.12.16/28
+    - ${IP_POOL_RANGE}
 
 ---
 # 2. Establish the BGP Peering Session to the Host Cluster Transit Router
@@ -16,9 +16,9 @@ metadata:
   name: peer-to-host-cluster
   namespace: metallb-system
 spec:
-  myASN: 64512
-  peerASN: 64511
-  peerAddress: 192.168.8.99
+  myASN: ${MY_ASN}
+  peerASN: ${PEER_ASN}
+  peerAddress: ${PEER_ADDRESS}
   ebgpMultiHop: true
 
 ---
@@ -26,8 +26,8 @@ spec:
 apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:
-  name: tenant2-bgp-adv
+  name: ${VCLUSTER_NAMESPACE}-bgp-adv
   namespace: metallb-system
 spec:
   ipAddressPools:
-  - tenant2-pool
+    - ${VCLUSTER_NAMESPACE}-pool

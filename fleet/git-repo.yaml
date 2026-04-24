@@ -6,8 +6,8 @@ metadata:
   name: k3k-automation-rancher
   namespace: fleet-local
 spec:
-  repo: "https://github.com/fultux/rancher-k3k-automation.git" # Replace with your actual repository URL
-  branch: main
+  repo: "${GIT_REPO_URL}"
+  branch: ${GIT_BRANCH}
   paths:
     - manifests/rancher
   targets:
@@ -21,10 +21,9 @@ metadata:
   name: k3k-automation-host
   namespace: fleet-default
 spec:
-  repo: "https://github.com/fultux/rancher-k3k-automation.git" # Replace with your actual repository URL
-  branch: main
+  repo: "${GIT_REPO_URL}"
+  branch: ${GIT_BRANCH}
   paths:
     - manifests/host
   targets:
-    # Replace with the actual name of your downstream cluster in Rancher Fleet
-    - clusterName: kubevip
+    - clusterName: ${HOST_CLUSTER_NAME}

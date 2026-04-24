@@ -7,10 +7,21 @@ set -e # Exit on error
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults ---
-VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
-VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
-HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
-FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
+export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
+export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
+export VCLUSTER_VERSION=${VCLUSTER_VERSION:-"v1.33.10-k3s1"}
+export HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
+export FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
+export STORAGE_CLASS=${STORAGE_CLASS:-"harvester"}
+export STORAGE_SIZE=${STORAGE_SIZE:-"3Gi"}
+export PARENT_CLUSTER_ID=${PARENT_CLUSTER_ID:-"c-m-8jclnfjn"}
+export PARENT_CLUSTER_NAME=${PARENT_CLUSTER_NAME:-"kubevip"}
+export IP_POOL_RANGE=${IP_POOL_RANGE:-"10.10.12.16/28"}
+export MY_ASN=${MY_ASN:-"64512"}
+export PEER_ASN=${PEER_ASN:-"64511"}
+export PEER_ADDRESS=${PEER_ADDRESS:-"192.168.8.99"}
+export GIT_REPO_URL=${GIT_REPO_URL:-"https://github.com/fultux/rancher-k3k-automation.git"}
+export GIT_BRANCH=${GIT_BRANCH:-"template"}
 
 if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
     echo "Error: RANCHER_KUBECONFIG and HOST_KUBECONFIG environment variables must be set."
@@ -33,7 +44,7 @@ echo "--- Deploying k3k cluster via Rancher Fleet ---"
 
 # 1. Sync Fleet to create the placeholder and the pods
 echo "Applying Fleet GitRepo definitions..."
-kc_local apply -f fleet/git-repo.yaml
+envsubst < fleet/git-repo.yaml | kc_local apply -f -
 
 # 2. Wait for Rancher to process the placeholder
 echo "Waiting for Virtual Cluster ID for '$VCLUSTER_NAME'..."
