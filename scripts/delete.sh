@@ -58,7 +58,7 @@ kc_host delete job agent-injector -n "$VCLUSTER_NAMESPACE" --ignore-not-found ||
 # 2. Delete Fleet GitRepo definitions
 echo "Deleting Fleet GitRepo definitions..."
 if [ -f "fleet/git-repo.yaml" ]; then
-    envsubst < fleet/git-repo.yaml | kc_local delete -f - --ignore-not-found || true
+    kc_local delete -f "fleet/git-repo.yaml" --ignore-not-found || true
 fi
 
 # 3. Ensure Rancher provisioning cluster is deleted

@@ -1,14 +1,14 @@
 apiVersion: k3k.io/v1beta1
 kind: Cluster
 metadata:
-  name: ${VCLUSTER_NAME}
-  namespace: ${VCLUSTER_NAMESPACE}
+  name: k3k-fleet-test
+  namespace: tenant2
 spec:
   mode: shared
-  version: ${VCLUSTER_VERSION}
+  version: v1.33.10-k3s1
   servers: 1
   agents: 1
   persistence:
     type: dynamic
-    storageClassName: "${STORAGE_CLASS}"
-    storageRequestSize: ${STORAGE_SIZE}
+    storageClassName: "harvester"
+    storageRequestSize: 3Gi

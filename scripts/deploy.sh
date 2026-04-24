@@ -40,13 +40,16 @@ kc_local() {
     kubectl --kubeconfig="$RANCHER_KUBECONFIG" "$@"
 }
 
+# 1. Render the templates
+./scripts/render.sh
+
 echo "--- Deploying k3k cluster via Rancher Fleet ---"
 
-# 1. Sync Fleet to create the placeholder and the pods
+# 2. Sync Fleet to create the placeholder and the pods
 echo "Applying Fleet GitRepo definitions..."
-envsubst < fleet/git-repo.yaml | kc_local apply -f -
+kc_local apply -f fleet/git-repo.yaml
 
-# 2. Wait for Rancher to process the placeholder
+# 3. Wait for Rancher to process the placeholder
 echo "Waiting for Virtual Cluster ID for '$VCLUSTER_NAME'..."
 while true; do
     VCLUSTER_ID=$(kc_local get cluster.provisioning.cattle.io "$VCLUSTER_NAME" -n "$FLEET_NAMESPACE" -o jsonpath='{.status.clusterName}' 2>/dev/null || true)

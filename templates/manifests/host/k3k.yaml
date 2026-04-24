@@ -1,0 +1,14 @@
+apiVersion: k3k.io/v1beta1
+kind: Cluster
+metadata:
+  name: ${VCLUSTER_NAME}
+  namespace: ${VCLUSTER_NAMESPACE}
+spec:
+  mode: shared
+  version: ${VCLUSTER_VERSION}
+  servers: 1
+  agents: 1
+  persistence:
+    type: dynamic
+    storageClassName: "${STORAGE_CLASS}"
+    storageRequestSize: ${STORAGE_SIZE}
