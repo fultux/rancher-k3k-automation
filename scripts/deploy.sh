@@ -9,7 +9,9 @@ cd "$(dirname "$0")/.."
 # --- Configuration & Defaults ---
 export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
 export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
+export VCLUSTER_MODE=${VCLUSTER_MODE:-"shared"}
 export VCLUSTER_VERSION=${VCLUSTER_VERSION:-"v1.33.10-k3s1"}
+export VCLUSTER_TLS_SANS=${VCLUSTER_TLS_SANS:-""}
 export HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
 export FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
 export STORAGE_CLASS=${STORAGE_CLASS:-"harvester"}

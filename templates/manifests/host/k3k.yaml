@@ -4,10 +4,11 @@ metadata:
   name: ${VCLUSTER_NAME}
   namespace: ${VCLUSTER_NAMESPACE}
 spec:
-  mode: shared
+  mode: ${VCLUSTER_MODE}
   version: ${VCLUSTER_VERSION}
   servers: 1
   agents: 1
+${TLS_SANS_BLOCK}
   persistence:
     type: dynamic
     storageClassName: "${STORAGE_CLASS}"
