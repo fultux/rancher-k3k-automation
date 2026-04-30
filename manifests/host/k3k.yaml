@@ -5,9 +5,6 @@ metadata:
   namespace: tenant2 # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
 spec:
   mode: virtual
-  k3sArgs:
-    - --disable=traefik
-    - --disable=servicelb
   version: v1.33.10-k3s1
   servers: 1
   agents: 1
