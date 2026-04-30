@@ -4,12 +4,12 @@ metadata:
   name: dev-k3k-automation-host
   namespace: fleet-default
 spec:
-  branch: main
+  branch: kustomize
   paths:
-  - manifests/host
+    - manifests/host
   repo: https://github.com/fultux/rancher-k3k-automation.git
   targets:
-  - clusterName: kubevip
+    - clusterName: kubevip
 ---
 apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
@@ -17,9 +17,9 @@ metadata:
   name: dev-k3k-automation-rancher
   namespace: fleet-local
 spec:
-  branch: main
+  branch: kustomize
   paths:
-  - manifests/rancher
+    - manifests/rancher
   repo: https://github.com/fultux/rancher-k3k-automation.git
   targets:
-  - clusterName: local
+    - clusterName: local
