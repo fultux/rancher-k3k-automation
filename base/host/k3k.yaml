@@ -1,0 +1,13 @@
+apiVersion: k3k.io/v1beta1
+kind: Cluster
+metadata:
+  name: cluster-base
+spec:
+  mode: shared
+  version: v1.33.10-k3s1
+  servers: 3
+  agents: 2
+  persistence:
+    type: dynamic
+    storageClassName: "harvester"
+    storageRequestSize: 3Gi

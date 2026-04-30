@@ -1,14 +1,14 @@
 apiVersion: k3k.io/v1beta1
 kind: Cluster
 metadata:
-  name: k3k-fleet-test
-  namespace: tenant2 # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
+  name: dev-cluster-base
+  namespace: tenant2
 spec:
-  mode: shared
-  version: v1.33.10-k3s1
-  servers: 1
   agents: 1
+  mode: shared
   persistence:
-    type: dynamic
-    storageClassName: "harvester"
+    storageClassName: harvester
     storageRequestSize: 3Gi
+    type: dynamic
+  servers: 1
+  version: v1.33.10-k3s1

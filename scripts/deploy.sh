@@ -7,10 +7,16 @@ set -e # Exit on error
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults ---
-VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
-VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
+# Dynamically extract values from the rendered manifests
+VCLUSTER_NAME=$(grep -A 2 'kind: Cluster' manifests/host/k3k.yaml | grep 'name:' | head -n 1 | awk '{print $2}')
+VCLUSTER_NAMESPACE=$(grep -A 5 'kind: Cluster' manifests/host/k3k.yaml | grep 'namespace:' | head -n 1 | awk '{print $2}')
 HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
 FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
+
+if [ -z "$VCLUSTER_NAME" ] || [ -z "$VCLUSTER_NAMESPACE" ]; then
+    echo "Error: Could not extract cluster name or namespace from manifests/host/k3k.yaml. Did you run render.sh?"
+    exit 1
+fi
 
 if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
     echo "Error: RANCHER_KUBECONFIG and HOST_KUBECONFIG environment variables must be set."
