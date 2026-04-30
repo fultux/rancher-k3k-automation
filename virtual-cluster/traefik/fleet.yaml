@@ -1,0 +1,8 @@
+defaultNamespace: traefik
+helm:
+  releaseName: traefik
+  repo: https://traefik.github.io/traefik-helm-chart
+  chart: traefik
+  values:
+    service:
+      type: LoadBalancer

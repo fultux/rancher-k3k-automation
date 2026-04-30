@@ -28,3 +28,18 @@ spec:
   targets:
     # Replace with the actual name of your downstream cluster in Rancher Fleet
     - clusterName: kubevip
+
+---
+# 3: Deploy the virtual cluster workloads (kube-vip, traefik) to the k3k virtual cluster
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: k3k-automation-vcluster
+  namespace: fleet-default
+spec:
+  repo: "https://github.com/fultux/rancher-k3k-automation.git" # Replace with your actual repository URL
+  branch: main
+  paths:
+    - virtual-cluster
+  targets:
+    - clusterName: k3k-fleet-test

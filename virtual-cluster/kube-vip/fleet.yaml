@@ -1,0 +1,23 @@
+defaultNamespace: kube-system
+helm:
+  releaseName: kube-vip
+  repo: https://kube-vip.github.io/helm-charts
+  chart: kube-vip
+  values:
+    config:
+      vip_arp: "true"
+      vip_interface: eth0
+    env:
+      vip_arp: "true"
+      vip_leaderelection: "true"
+      vip_interface: eth0
+      lb_enable: "true"
+      lb_port: "6443"
+      svc_enable: "true"
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: "true"
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists

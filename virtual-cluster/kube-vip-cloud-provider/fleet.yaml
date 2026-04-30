@@ -1,0 +1,5 @@
+defaultNamespace: kube-system
+helm:
+  releaseName: kube-vip-cloud-provider
+  repo: https://kube-vip.github.io/helm-charts
+  chart: kube-vip-cloud-provider
