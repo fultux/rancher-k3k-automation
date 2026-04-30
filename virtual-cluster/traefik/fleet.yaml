@@ -1,7 +1,7 @@
 defaultNamespace: traefik
 helm:
   releaseName: traefik
-  repo: https://traefik.github.io/traefik-helm-chart
+  repo: oci://ghcr.io/traefik/helm/traefik
   chart: traefik
   values:
     service:
