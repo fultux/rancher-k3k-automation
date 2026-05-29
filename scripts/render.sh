@@ -5,8 +5,8 @@ set -e
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults (Synchronized with deploy.sh) ---
-export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
-export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
+export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-virt"}
+export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"virtual-clusters"}
 export VCLUSTER_MODE=${VCLUSTER_MODE:-"virtual"}
 export VCLUSTER_SERVERS=${VCLUSTER_SERVERS:-3}
 export VCLUSTER_AGENTS=${VCLUSTER_AGENTS:-2}
