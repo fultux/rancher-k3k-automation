@@ -7,9 +7,9 @@ set -e # Exit on error
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults ---
-VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
-VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
-HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
+VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-virt"}
+VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"virtual-clusters"}
+HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"host-cluster"}
 FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
 
 if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
