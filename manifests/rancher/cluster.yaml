@@ -1,18 +1,3 @@
-☁  rancher-k3k-automation [main]     kubectl --kubeconfig="$HOST_KUBECONFIG" get pvc -n virtual-clusters
-
-NAME                                           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-varlibrancherk3s-k3k-k3k-fleet-virt-server-0   Bound    pvc-a60bf282-3e6d-487e-8c71-40e7341414d0   3Gi        RWO            harvester      <unset>                 22m
-☁  rancher-k3k-automation [main]     kubectl --kubeconfig="$HOST_KUBECONFIG" delete pvc varlibrancherk3s-k3k-k3k-fleet-virt-server-0 -n virtual-clusters
-
-persistentvolumeclaim "varlibrancherk3s-k3k-k3k-fleet-virt-server-0" deleted
-
-
-
-
-
-^C☁  rancher-k3k-automation [main    kubectl --kubeconfig="$HOST_KUBECONFIG" delete pod k3k-k3k-fleet-virt-server-0 -n virtual-clustersrs
-
-pod "k3k-k3k-fleet-virt-server-0" deleted
 apiVersion: provisioning.cattle.io/v1
 kind: Cluster
 metadata:
@@ -26,3 +11,4 @@ metadata:
     ui.rancher/parent-cluster-display: host-cluster
     ui.rancher/provider: k3k
     rancher.io/imported-cluster-version-management: "false"
+spec: {}
