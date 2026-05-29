@@ -27,7 +27,7 @@ spec:
     - manifests/host
   targets:
     # Replace with the actual name of your downstream cluster in Rancher Fleet
-    - clusterName: kubevip
+    - clusterName: host-cluster
 
 ---
 # 3: Deploy the virtual cluster workloads (kube-vip, traefik) to the k3k virtual cluster
