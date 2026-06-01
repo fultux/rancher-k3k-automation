@@ -4,7 +4,7 @@ metadata:
   name: k3k-fleet-virt
   namespace: virtual-clusters # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
 spec:
-  mode: virtual
+  mode: shared
   version: v1.35.4-k3s1
   servers: 1
   agents: 1
@@ -12,3 +12,12 @@ spec:
     type: dynamic
     storageClassName: "harvester"
     storageRequestSize: 3Gi
+  sync:
+    persistentVolumeClaims:
+      enabled: true
+    configMaps:
+      enabled: true
+    secrets:
+      enabled: true
+    ingresses:
+      enabled: true

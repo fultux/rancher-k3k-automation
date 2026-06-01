@@ -3,8 +3,6 @@ kind: Cluster
 metadata:
   name: k3k-fleet-virt
   namespace: fleet-default
-  labels:
-    deploy-metallb: allowed
   annotations:
     ui.rancher/k3k-namespace: virtual-clusters
     ui.rancher/parent-cluster: c-m-vhmcxg95
