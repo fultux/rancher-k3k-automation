@@ -2,7 +2,7 @@
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: virtual-clusters-pool
+  name: tenant2-pool
   namespace: metallb-system
 spec:
   addresses:
@@ -26,8 +26,8 @@ spec:
 apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:
-  name: virtual-clusters-bgp-adv
+  name: tenant2-bgp-adv
   namespace: metallb-system
 spec:
   ipAddressPools:
-    - virtual-clusters-pool
+    - tenant2-pool

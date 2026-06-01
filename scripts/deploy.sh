@@ -7,16 +7,16 @@ set -e # Exit on error
 cd "$(dirname "$0")/.."
 
 # --- Configuration & Defaults ---
-export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-test"}
+export VCLUSTER_NAME=${VCLUSTER_NAME:-"k3k-fleet-virt"}
 export VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant2"}
-export VCLUSTER_MODE=${VCLUSTER_MODE:-"shared"}
+export VCLUSTER_MODE=${VCLUSTER_MODE:-"virtual"}
 export VCLUSTER_VERSION=${VCLUSTER_VERSION:-"v1.33.10-k3s1"}
 export VCLUSTER_TLS_SANS=${VCLUSTER_TLS_SANS:-""}
-export HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"kubevip"}
+export HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"host-cluster"}
 export FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
 export STORAGE_CLASS=${STORAGE_CLASS:-"harvester"}
 export STORAGE_SIZE=${STORAGE_SIZE:-"3Gi"}
-export PARENT_CLUSTER_ID=${PARENT_CLUSTER_ID:-"c-m-8jclnfjn"}
+export PARENT_CLUSTER_ID=${PARENT_CLUSTER_ID:-"c-m-vhmcxg95"}
 export PARENT_CLUSTER_NAME=${PARENT_CLUSTER_NAME:-"kubevip"}
 export IP_POOL_RANGE=${IP_POOL_RANGE:-"10.10.12.16/28"}
 export MY_ASN=${MY_ASN:-"64512"}
