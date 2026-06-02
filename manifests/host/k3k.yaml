@@ -21,3 +21,5 @@ spec:
       enabled: true
     ingresses:
       enabled: true
+    storageClasses:
+      enabled: true
