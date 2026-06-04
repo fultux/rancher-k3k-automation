@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 # --- Configuration & Defaults ---
 VCLUSTER_NAME=${VCLUSTER_NAME:-"demo-shared"}
 VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"shared-tenant"}
-HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"host-cluster"}
+HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"demo-host-k3k"}
 FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
 
 if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
