@@ -1,10 +1,10 @@
 apiVersion: provisioning.cattle.io/v1
 kind: Cluster
 metadata:
-  name: k3k-fleet-virt
+  name: demo-shared
   namespace: fleet-default
   annotations:
-    ui.rancher/k3k-namespace: virtual-clusters
+    ui.rancher/k3k-namespace: shared-tenant
     ui.rancher/parent-cluster: c-m-vhmcxg95
     ui.rancher/parent-cluster-display: host-cluster
     ui.rancher/provider: k3k

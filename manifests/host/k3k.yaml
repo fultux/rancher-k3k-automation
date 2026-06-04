@@ -1,8 +1,8 @@
 apiVersion: k3k.io/v1beta1
 kind: Cluster
 metadata:
-  name: k3k-fleet-virt
-  namespace: virtual-clusters # Must match the ui.rancher/k3k-namespace annotation in manifest-rancher
+  name: demo-shared
+  namespace: shared-tenant
 spec:
   mode: shared
   version: v1.35.4-k3s1
@@ -23,3 +23,5 @@ spec:
       enabled: true
     storageClasses:
       enabled: true
+      selector:
+        tier: standard
