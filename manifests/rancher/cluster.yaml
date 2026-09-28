@@ -1,7 +1,7 @@
 apiVersion: provisioning.cattle.io/v1
 kind: Cluster
 metadata:
-  name: demo-shared
+  name: vcluster1
   namespace: fleet-default
   annotations:
     ui.rancher/k3k-namespace: tenant1
