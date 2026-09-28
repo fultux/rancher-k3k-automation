@@ -1,0 +1,27 @@
+apiVersion: k3k.io/v1beta1
+kind: Cluster
+metadata:
+  name: vcluster1
+  namespace: tenant1
+spec:
+  mode: shared
+  version: v1.35.6-k3s1
+  servers: 1
+  agents: 1
+  persistence:
+    type: dynamic
+    storageClassName: "nfs-sc1"
+    storageRequestSize: 3Gi
+  sync:
+    persistentVolumeClaims:
+      enabled: true
+    configMaps:
+      enabled: true
+    secrets:
+      enabled: true
+    ingresses:
+      enabled: true
+    storageClasses:
+      enabled: true
+      selector:
+        tier: premium
