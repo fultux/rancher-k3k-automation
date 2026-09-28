@@ -1,8 +1,8 @@
 apiVersion: k3k.io/v1beta1
 kind: Cluster
 metadata:
-  name: demo-shared
-  namespace: shared-tenant
+  name: vcluster1
+  namespace: tenant1
 spec:
   mode: shared
   version: v1.35.4-k3s1
@@ -10,7 +10,7 @@ spec:
   agents: 1
   persistence:
     type: dynamic
-    storageClassName: "harvester"
+    storageClassName: "nfs-sc1"
     storageRequestSize: 3Gi
   sync:
     persistentVolumeClaims:

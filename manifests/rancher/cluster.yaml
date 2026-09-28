@@ -5,7 +5,7 @@ metadata:
   namespace: fleet-default
   annotations:
     ui.rancher/k3k-namespace: tenant1
-    ui.rancher/parent-cluster: c-m-7wmqrvqm
+    ui.rancher/parent-cluster: c-m-jwkqbt8g
     ui.rancher/parent-cluster-display: host
     ui.rancher/provider: k3k
     rancher.io/imported-cluster-version-management: "false"
