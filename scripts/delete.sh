@@ -72,9 +72,9 @@ done
 # 6. Cleanup cluster registration tokens
 if [ -n "$VCLUSTER_ID" ]; then
     echo "Cleaning up any dangling ClusterRegistrationTokens for cluster $VCLUSTER_ID..."
-    for token in $(kc_local get clusterregistrationtoken -n "$VCLUSTER_ID" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true); do
+    for token in $(kc_local get clusterregistrationtokens.management.cattle.io -n "$VCLUSTER_ID" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true); do
         if [ -n "$token" ]; then
-            kc_local delete clusterregistrationtoken "$token" -n "$VCLUSTER_ID" --ignore-not-found || true
+            kc_local delete clusterregistrationtokens.management.cattle.io "$token" -n "$VCLUSTER_ID" --ignore-not-found || true
         fi
     done
 fi

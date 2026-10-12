@@ -60,7 +60,7 @@ else
     echo "Getting Import Command for Rancher Virtual Cluster..."
 
     echo "Checking for existing ClusterRegistrationToken..."
-    TOKEN_NAME=$(kc_local get clusterregistrationtoken -n "$VCLUSTER_ID" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    TOKEN_NAME=$(kc_local get clusterregistrationtokens.management.cattle.io -n "$VCLUSTER_ID" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
 
     if [ -z "$TOKEN_NAME" ]; then
         TOKEN_NAME="token-$(date +%s)"
@@ -76,9 +76,17 @@ spec:
 EOF
     fi
 
-    # Wait for the cluster registration secret to be generated
+    # Wait for the cluster registration secret or token to be generated
     while true; do
-        TOKEN=$(kc_local get secret "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.data.token}' 2>/dev/null | base64 -d || true)
+        # 1. Try to get token from status.tokenSecretName (Rancher >= 2.14)
+        TOKEN_SECRET_NAME=$(kc_local get clusterregistrationtokens.management.cattle.io "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.status.tokenSecretName}' 2>/dev/null || true)
+        if [ -n "$TOKEN_SECRET_NAME" ]; then
+            TOKEN=$(kc_local get secret "$TOKEN_SECRET_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.data.token}' 2>/dev/null | base64 -d || true)
+        else
+            # 2. Fallback to status.token (Rancher < 2.14)
+            TOKEN=$(kc_local get clusterregistrationtokens.management.cattle.io "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.status.token}' 2>/dev/null || true)
+        fi
+
         if [ -n "$TOKEN" ]; then break; fi
         sleep 5
     done
