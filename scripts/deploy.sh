@@ -33,7 +33,7 @@ echo "--- Deploying k3k cluster via Rancher Fleet ---"
 
 # 1. Sync Fleet to create the placeholder and the pods
 echo "Applying Fleet GitRepo definitions..."
-kc_local apply -f fleet/git-repo.yaml
+kc_local apply -f manifests/fleet/git-repo.yaml
 
 # 2. Wait for Rancher to process the placeholder
 echo "Waiting for Virtual Cluster ID for '$VCLUSTER_NAME'..."
@@ -76,12 +76,13 @@ spec:
 EOF
     fi
 
-    # Wait for the cluster registration token to be generated
+    # Wait for the cluster registration secret to be generated
     while true; do
-        IMPORT_CMD=$(kc_local get ClusterRegistrationToken.management.cattle.io "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.status.insecureCommand}' 2>/dev/null || true)
-        if [ -n "$IMPORT_CMD" ]; then break; fi
+        TOKEN=$(kc_local get secret "$TOKEN_NAME" -n "$VCLUSTER_ID" -o jsonpath='{.data.token}' 2>/dev/null | base64 -d || true)
+        if [ -n "$TOKEN" ]; then break; fi
         sleep 5
     done
+    IMPORT_CMD="curl --insecure -sfL ${RANCHER_BASE_URL}/v3/import/${TOKEN}_${VCLUSTER_ID}.yaml | kubectl apply -f -"
 fi
 
 # 4. Wait for k3k to generate kubeconfig on host cluster
