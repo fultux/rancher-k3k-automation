@@ -10,7 +10,7 @@ The deployment relies on two distinct deployment targets managed by Fleet:
 
 ## Repository Structure
 
-* `fleet/`: Contains `git-repo.yaml`, the core Fleet configuration defining the Git repositories, paths, and deployment targets.
+* `manifests/fleet/`: Contains `git-repo.yaml`, the core Fleet configuration defining the Git repositories, paths, and deployment targets.
 * `manifests/host/`: Contains the Custom Resources for the k3k operator (virtual cluster definitions).
 * `manifests/rancher/`: Contains the Rancher provisioning resources.
 * `scripts/`: Contains the `deploy.sh` and `delete.sh` automation scripts for lifecycle management and automated Rancher importation.
@@ -50,7 +50,7 @@ Update the provided examples to match your environment:
 
 ### 2. Update the GitRepo Definitions
 
-Edit `fleet/git-repo.yaml`:
+Edit `manifests/fleet/git-repo.yaml`:
 * Change `spec.repo` in both definitions to the URL of your fork or copy of this repository.
 * Ensure the branch matches your working branch.
 * In the `k3k-automation-host` resource, update the `targets[0].clusterName` to match the exact Fleet cluster name of your downstream host cluster.

@@ -46,7 +46,9 @@ kc_host delete job agent-injector -n "$VCLUSTER_NAMESPACE" --ignore-not-found ||
 
 # 2. Delete Fleet GitRepo definitions
 echo "Deleting Fleet GitRepo definitions..."
-if [ -f "fleet/git-repo.yaml" ]; then
+if [ -f "manifests/fleet/git-repo.yaml" ]; then
+    kc_local delete -f "manifests/fleet/git-repo.yaml" --ignore-not-found || true
+elif [ -f "fleet/git-repo.yaml" ]; then
     kc_local delete -f "fleet/git-repo.yaml" --ignore-not-found || true
 fi
 
