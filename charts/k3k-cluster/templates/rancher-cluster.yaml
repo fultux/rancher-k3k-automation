@@ -1,0 +1,13 @@
+{{- if eq .Values.render "rancher" }}
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.rancher.namespace }}
+  annotations:
+    ui.rancher/k3k-namespace: {{ .Values.namespace }}
+    ui.rancher/parent-cluster: {{ .Values.rancher.parentCluster }}
+    ui.rancher/parent-cluster-display: {{ .Values.rancher.parentClusterDisplay }}
+    ui.rancher/provider: k3k
+    rancher.io/imported-cluster-version-management: "false"
+{{- end }}

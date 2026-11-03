@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: agent-injector
+  namespace: ${VCLUSTER_NAMESPACE}
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: injector
+        image: ${INJECTOR_IMAGE}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            apk add --no-cache curl
+            curl -sLO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x kubectl && mv kubectl /usr/local/bin/
+            export KUBECONFIG=/etc/vcluster/kubeconfig.yaml
+            echo "Executing import command..."
+            ${IMPORT_CMD}
+        volumeMounts:
+        - name: kubeconfig
+          mountPath: /etc/vcluster
+          readOnly: true
+      volumes:
+      - name: kubeconfig
+        secret:
+          secretName: ${SECRET_NAME}
+      restartPolicy: OnFailure

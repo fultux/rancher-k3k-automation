@@ -1,0 +1,32 @@
+# Which object to render: "host" (k3k Cluster) or "rancher" (provisioning Cluster).
+# fleet.yaml sets it per target cluster.
+render: host
+
+name: vcluster1
+namespace: tenant1
+# Create the tenant namespace on the host cluster (kept on uninstall).
+createNamespace: true
+
+k3k:
+  mode: shared
+  version: v1.35.4-k3s1
+  servers: 1
+  agents: 1
+  persistence:
+    type: dynamic
+    storageClassName: "" # empty uses the host cluster's default class
+    storageRequestSize: 3Gi
+  sync:
+    persistentVolumeClaims: true
+    configMaps: true
+    secrets: true
+    ingresses: true
+    storageClasses:
+      enabled: true
+      selector:
+        tier: standard
+
+rancher:
+  namespace: fleet-default
+  parentCluster: REPLACE_WITH_HOST_CLUSTER_ID # Rancher ID of the host cluster, required
+  parentClusterDisplay: host

@@ -5,14 +5,14 @@ This repository provides an automated workflow using **Rancher Fleet** and custo
 ## Architecture
 
 The deployment relies on two distinct deployment targets managed by Fleet:
-1. **Host Cluster (`manifests/host/`)**: The downstream cluster running the `k3k` operator. We deploy the `k3k.io/v1beta1` Cluster object here to physically create the virtual control plane and worker nodes.
-2. **Local Management Cluster (`manifests/rancher/`)**: Where Rancher itself is installed. We create a `provisioning.cattle.io/v1` Cluster object here. This tells Rancher to track the k3k virtual cluster and provides the necessary metadata for the Rancher UI.
+1. **Host Cluster (`render: host`)**: The downstream cluster running the `k3k` operator. We deploy the `k3k.io/v1beta1` Cluster object here to physically create the virtual control plane and worker nodes.
+2. **Local Management Cluster (`render: rancher`)**: Where Rancher itself is installed. We create a `provisioning.cattle.io/v1` Cluster object here. This tells Rancher to track the k3k virtual cluster and provides the necessary metadata for the Rancher UI.
 
 ## Repository Structure
 
 * `manifests/fleet/`: Contains `git-repo.yaml`, the core Fleet configuration defining the Git repositories, paths, and deployment targets.
-* `manifests/host/`: Contains the Custom Resources for the k3k operator (virtual cluster definitions).
-* `manifests/rancher/`: Contains the Rancher provisioning resources.
+* `charts/k3k-cluster/`: Helm chart rendered by Fleet. `values.yaml` holds the defaults; `fleet.yaml` selects the `host` (k3k Cluster) or `rancher` (provisioning Cluster) object per target cluster.
+* `templates/injector/`: Manifests rendered with `envsubst` by `deploy.sh` (agent injector Job, ClusterRegistrationToken).
 * `scripts/`: Contains the `deploy.sh` and `delete.sh` automation scripts for lifecycle management and automated Rancher importation.
 
 ## Prerequisites
@@ -37,23 +37,19 @@ export HOST_KUBECONFIG="/path/to/downstream-host.yaml"
 
 Update the provided examples to match your environment:
 
-**`manifests/host/k3k.yaml`**
-* Update the `namespace` to your target tenant namespace (e.g., `tenant1`).
-* Set the desired `version` (e.g., `v1.33.10-k3s1`).
-* Ensure `spec.persistence.storageClassName` matches an available storage class on your host cluster.
+Edit `charts/k3k-cluster/values.yaml`:
+* `name` and `namespace`: the virtual cluster name and its tenant namespace (e.g., `tenant1`). Both objects use them, so they cannot drift apart.
+* `k3k.version` and `k3k.persistence.storageClassName`: the k3s version and a storage class available on your host cluster. An empty `storageClassName` uses the host cluster's default class.
+* `rancher.parentCluster` and `rancher.parentClusterDisplay`: the Rancher Cluster ID (e.g., `c-m-dmj78vrr`) and display name of your host cluster. `parentCluster` ships as `REPLACE_WITH_HOST_CLUSTER_ID` and must be set.
 
-**`manifests/rancher/cluster.yaml`**
-* Ensure `metadata.name` matches the `metadata.name` in your `k3k.yaml`.
-* Update the `ui.rancher/k3k-namespace` annotation to match the namespace used in `k3k.yaml`.
-* Update `ui.rancher/parent-cluster` to the actual Rancher Cluster ID of your host cluster (e.g., `c-m-dmj78vrr`).
-* Update `ui.rancher/parent-cluster-display` to the display name of your host cluster.
+In `charts/k3k-cluster/fleet.yaml`, set each `clusterName` to the Fleet cluster name of the management cluster (`local`) and of your host cluster.
 
 ### 2. Update the GitRepo Definitions
 
 Edit `manifests/fleet/git-repo.yaml`:
 * Change `spec.repo` in both definitions to the URL of your fork or copy of this repository.
 * Ensure the branch matches your working branch.
-* In the `k3k-automation-host` resource, update the `targets[0].clusterName` to match the exact Fleet cluster name of your downstream host cluster.
+* In the `k3k-automation-host` resource, update the `targets[0].clusterName` (also in `charts/k3k-cluster/fleet.yaml`) to match the exact Fleet cluster name of your downstream host cluster.
 
 ### 3. Deploy the Virtual Cluster
 

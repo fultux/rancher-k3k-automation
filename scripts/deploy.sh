@@ -11,6 +11,7 @@ VCLUSTER_NAME=${VCLUSTER_NAME:-"vcluster1"}
 VCLUSTER_NAMESPACE=${VCLUSTER_NAMESPACE:-"tenant1"}
 HOST_CLUSTER_NAME=${HOST_CLUSTER_NAME:-"host"}
 FLEET_NAMESPACE=${FLEET_NAMESPACE:-"fleet-default"}
+INJECTOR_IMAGE=${INJECTOR_IMAGE:-"alpine:latest"}
 
 if [ -z "$RANCHER_KUBECONFIG" ] || [ -z "$HOST_KUBECONFIG" ]; then
     echo "Error: RANCHER_KUBECONFIG and HOST_KUBECONFIG environment variables must be set."
@@ -21,6 +22,11 @@ fi
 
 if ! command -v kubectl &> /dev/null; then
     echo "Error: kubectl is required but not installed."
+    exit 1
+fi
+
+if ! command -v envsubst &> /dev/null; then
+    echo "Error: envsubst (gettext) is required but not installed."
     exit 1
 fi
 
@@ -65,15 +71,8 @@ else
     if [ -z "$TOKEN_NAME" ]; then
         TOKEN_NAME="token-$(date +%s)"
         echo "Creating ClusterRegistrationToken $TOKEN_NAME..."
-        cat <<EOF | kc_local create -f -
-apiVersion: management.cattle.io/v3
-kind: ClusterRegistrationToken
-metadata:
-  name: $TOKEN_NAME
-  namespace: $VCLUSTER_ID
-spec:
-  clusterName: $VCLUSTER_ID
-EOF
+        export TOKEN_NAME VCLUSTER_ID
+        envsubst '$TOKEN_NAME $VCLUSTER_ID' < templates/injector/registration-token.yaml | kc_local create -f -
     fi
 
     # Wait for the cluster registration secret or token to be generated
@@ -109,38 +108,8 @@ done
 echo "Deploying agent injector job to the host cluster..."
 kc_host delete job agent-injector -n "$VCLUSTER_NAMESPACE" 2>/dev/null || true
 
-cat <<EOF | kc_host apply -f -
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: agent-injector
-  namespace: $VCLUSTER_NAMESPACE
-spec:
-  backoffLimit: 3
-  template:
-    spec:
-      containers:
-      - name: injector
-        image: alpine:latest
-        command: ["/bin/sh", "-c"]
-        args:
-          - |
-            apk add --no-cache curl
-            curl -sLO https://dl.k8s.io/release/\$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
-            chmod +x kubectl && mv kubectl /usr/local/bin/
-            export KUBECONFIG=/etc/vcluster/kubeconfig.yaml
-            echo "Executing import command..."
-            $IMPORT_CMD
-        volumeMounts:
-        - name: kubeconfig
-          mountPath: /etc/vcluster
-          readOnly: true
-      volumes:
-      - name: kubeconfig
-        secret:
-          secretName: $SECRET_NAME
-      restartPolicy: OnFailure
-EOF
+export VCLUSTER_NAMESPACE INJECTOR_IMAGE SECRET_NAME IMPORT_CMD
+envsubst '$VCLUSTER_NAMESPACE $INJECTOR_IMAGE $SECRET_NAME $IMPORT_CMD' < templates/injector/agent-injector-job.yaml | kc_host apply -f -
 
 # 6. Verify Injection Job finishes
 echo "Waiting for the agent injection job to complete..."
