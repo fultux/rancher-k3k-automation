@@ -1,0 +1,5 @@
+apiVersion: v2
+name: k3k-cluster
+description: k3k virtual cluster (host side) and its Rancher provisioning representation (management side)
+type: application
+version: 0.1.0

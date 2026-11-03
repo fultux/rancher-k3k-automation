@@ -1,0 +1,7 @@
+apiVersion: management.cattle.io/v3
+kind: ClusterRegistrationToken
+metadata:
+  name: ${TOKEN_NAME}
+  namespace: ${VCLUSTER_ID}
+spec:
+  clusterName: ${VCLUSTER_ID}

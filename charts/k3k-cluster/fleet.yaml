@@ -1,0 +1,14 @@
+# One chart, two GitRepos: each one targets a single cluster, so only one
+# customization matches and selects which object is rendered.
+defaultNamespace: fleet-default
+targetCustomizations:
+  - name: rancher
+    clusterName: local
+    helm:
+      values:
+        render: rancher
+  - name: host
+    clusterName: host
+    helm:
+      values:
+        render: host

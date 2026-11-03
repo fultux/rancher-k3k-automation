@@ -1,0 +1,29 @@
+{{- if eq .Values.render "host" }}
+apiVersion: k3k.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  mode: {{ .Values.k3k.mode }}
+  version: {{ .Values.k3k.version }}
+  servers: {{ .Values.k3k.servers }}
+  agents: {{ .Values.k3k.agents }}
+  persistence:
+    type: {{ .Values.k3k.persistence.type }}
+    storageClassName: {{ .Values.k3k.persistence.storageClassName | quote }}
+    storageRequestSize: {{ .Values.k3k.persistence.storageRequestSize }}
+  sync:
+    persistentVolumeClaims:
+      enabled: {{ .Values.k3k.sync.persistentVolumeClaims }}
+    configMaps:
+      enabled: {{ .Values.k3k.sync.configMaps }}
+    secrets:
+      enabled: {{ .Values.k3k.sync.secrets }}
+    ingresses:
+      enabled: {{ .Values.k3k.sync.ingresses }}
+    storageClasses:
+      enabled: {{ .Values.k3k.sync.storageClasses.enabled }}
+      selector:
+        {{- toYaml .Values.k3k.sync.storageClasses.selector | nindent 8 }}
+{{- end }}
